@@ -1,47 +1,38 @@
-++Case Study: Automated Azure Hybrid Networking (Hub-and-Spoke VPN)
-++Project Overview
+Case Study: Azure Hybrid Hub-and-Spoke VPN
 
-This project demonstrates the automated deployment of a Hub-and-Spoke network topology in Microsoft Azure using the Azure CLI. It simulates a "Hybrid Cloud" environment by connecting a simulated on-premises network to an Azure Hub VNet via a Site-to-Site VPN tunnel with BGP (Border Gateway Protocol) enabled for dynamic routing.
-++Tech Stack
+Overview
+Automated deployment of an Azure Hub-and-Spoke topology simulating a Hybrid Cloud via Site-to-Site VPN with BGP dynamic routing.
 
-    Cloud Provider: Microsoft Azure
+Tech Stack
 
-    Infrastructure as Code (IaC): Azure CLI (Bash) / PowerShell Core
+    Provider: Microsoft Azure
 
-    Networking: Virtual Networks (VNet), VPN Gateways, Local Network Gateways, BGP
+    IaC: Azure CLI (Bash/PowerShell)
 
-    Compute: Ubuntu 22.04 LTS (Standard_B2s)
+    Networking: VNets, VPN Gateways, BGP (ASN 65001/65002)
 
-++Architecture
+    Compute: Ubuntu 22.04 (Standard_B2s)
 
-The deployment consists of two distinct environments:
+Architecture
 
-    Hub VNet (10.0.0.0/16): Represents the central transit point in Azure.
+    Hub VNet (10.0.0.0/16): Central transit point in Azure.
 
-    On-Premises VNet (10.128.0.0/16): Simulates a local data center environment.
+    On-Prem VNet (10.128.0.0/16): Simulated local data center.
 
-    Encrypted Tunnel: A Route-Based VPN using BGP to automatically exchange routes between the two environments.
+    Tunnel: Route-based encrypted VPN with automatic route exchange.
 
-++Key Features & Implementation
+Key Features
 
-    Automated Resource Provisioning: Scripted the creation of VNets, Subnets, and Public IPs to ensure repeatable deployments.
+    High-Availability: Used VpnGw1AZ SKUs for zone-aware reliability.
 
-    High-Availability VPN: Utilized VpnGw1AZ (Availability Zone-aware) SKUs for the VPN Gateways.
+    Governance: Deployed Standard_B2s to meet lab/enterprise policy restrictions.
 
-    Policy-Compliant Compute: Configured VM deployments to use Standard_B2s sizes, ensuring compatibility with restrictive enterprise/lab subscription policies.
+    Automation: Scripted VNet, Subnet, and Gateway provisioning for repeatability.
 
-    Dynamic Routing: Configured Autonomous System Numbers (ASN 65001 & 65002) to verify BGP peering and traffic flow.
+Lessons and Business Case
 
-++Lessons Learned & Troubleshooting
+    Policy Awareness: Resolved RequestDisallowedByPolicy errors by pivoting to B-series SKUs, demonstrating environment-specific governance skills.
 
-    Policy Constraints: Initial deployment attempts failed due to Azure Policy restrictions on VM SKUs. I pivoted from Standard_DS1_v2 to Standard_B2s, demonstrating the importance of understanding environment-specific governance.
+    PoC Strategy: Used B-series for low-risk, cost-efficient validation. This establishes a Scalability Path—confirming architectural Proof of Value before scaling to production tiers.
 
-    Gateway Latency: Azure VPN Gateway provisioning typically takes 25–45 minutes. I learned to structure scripts with asynchronous checks or clear progress indicators to improve the developer experience.Business Case: Pilot & PoC Readiness
-
-++While the Standard_B2s SKU is used here for cost-efficiency, it serves a strategic purpose for Proof of Concept (PoC) and Pilot Projects:
-
-    Low-Risk Validation: Enables stakeholders to validate connectivity and application logic without committing to high-cost premium tiers during the initial testing phase.
-
-    Scalability Path: Using B-Series for a pilot allows the team to establish the networking foundation (VNets/Gateways) which can then be seamlessly scaled to Production-grade instances (e.g., D-Series or F-Series) once the architectural "Proof of Value" is confirmed.
-
-    Performance Baseline: Provides a baseline for burstable performance, allowing engineers to monitor CPU credits and determine if the workload requires dedicated compute resources before the full-scale rollout.
+    Efficiency: Managed the 45-minute gateway provisioning latency by implementing asynchronous CLI logic.
